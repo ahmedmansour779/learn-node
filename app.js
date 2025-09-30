@@ -2,11 +2,14 @@ const express = require('express')
 const app = express()
 const port = 3000
 const mongoose = require('mongoose');
+const Name = require("./models/myDataSchema");
+const Articles = require("./models/articles");
 
-// const Cat = mongoose.model('Cat', { name: String });
+app.use(express.urlencoded({ extended: true }));
 
-// const kitty = new Cat({ name: 'Zildjian' });
-// kitty.save().then(() => console.log('meow'));
+// const C e().then(() => console.log('meow'));
+
+
 
 
 app.get('/', (req, res) => {
@@ -18,6 +21,9 @@ app.get('/page', (req, res) => {
 app.get('/form', (req, res) => {
     res.sendFile('./pages/form.html', { root: __dirname })
 })
+app.get('/articles-post', (req, res) => {
+    res.sendFile('./pages/articles.html', { root: __dirname })
+})
 
 app.listen(port, () => {
     console.log(`http://localhost:${port}/`)
@@ -28,3 +34,20 @@ mongoose.connect('mongodb+srv://ahmed11ahmed2992002_db_user:Ah7ncJS6E3qWAitA@clu
     console.log("error", res);
 });
 
+
+
+app.post('/form', (req, res) => {
+    console.log(req.body);
+    const nameData = new Name(req.body)
+    nameData.save().then(() => { res.redirect("/page") }).catch((err) => console.log(err)
+    )
+})
+
+app.post('/articles-post', (req, res) => {
+    console.log(req.body);
+    const articlesData = new Articles(req.body)
+    articlesData.save().
+        then(() => { res.redirect("/page") }).
+        catch((err) => console.log(err)
+        )
+})
