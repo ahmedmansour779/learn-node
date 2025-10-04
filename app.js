@@ -3,17 +3,26 @@ const app = express()
 const port = 3000
 const mongoose = require('mongoose');
 const Name = require("./models/myDataSchema");
-const Articles = require("./models/articles");
-
 app.use(express.urlencoded({ extended: true }));
-
+const Articles = require("./models/articles");
+app.set('view engine', 'ejs')
 // const C e().then(() => console.log('meow'));
 
 
 
 
 app.get('/', (req, res) => {
-    res.send('hello ahmed')
+
+
+    Articles.find().
+        then((result) => {
+            res.render("articles", { myTitle: "Home page", data: result })
+        }).catch(() => {
+            console.log("error");
+        })
+
+
+
 })
 app.get('/page', (req, res) => {
     res.sendFile('./pages/hello.html', { root: __dirname })
@@ -47,7 +56,7 @@ app.post('/articles-post', (req, res) => {
     console.log(req.body);
     const articlesData = new Articles(req.body)
     articlesData.save().
-        then(() => { res.redirect("/page") }).
+        then(() => { res.redirect("/") }).
         catch((err) => console.log(err)
         )
 })
