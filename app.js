@@ -7,7 +7,7 @@ app.use(express.urlencoded({ extended: true }));
 const Articles = require("./models/articles");
 app.set('view engine', 'ejs')
 // const C e().then(() => console.log('meow'));
-
+app.use(express.static('public'))
 
 
 
@@ -60,3 +60,20 @@ app.post('/articles-post', (req, res) => {
         catch((err) => console.log(err)
         )
 })
+
+
+// auto refresh
+const path = require("path");
+const livereload = require("livereload");
+const liveReloadServer = livereload.createServer();
+liveReloadServer.watch(path.join(__dirname, 'public'));
+
+
+const connectLivereload = require("connect-livereload");
+app.use(connectLivereload());
+
+liveReloadServer.server.once("connection", () => {
+    setTimeout(() => {
+        liveReloadServer.refresh("/");
+    }, 100);
+});
