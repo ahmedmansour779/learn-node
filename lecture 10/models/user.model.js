@@ -32,6 +32,10 @@ const userSchema = new mongoose.Schema({
     avatar: {
         type: String,
         default: 'https://res.cloudinary.com/prod/image/upload/ar_1:1,c_auto,g_auto,w_500/r_max/me/rc/portrait-2.png'
+    },
+    isVerified: {
+        type: Boolean,
+        default: false
     }
 });
 

@@ -6,8 +6,9 @@ const { validationResult } = require("express-validator");
 const bcryptjs = require("bcryptjs");
 const generateToken = require("../utils/generate.token");
 const { default: mongoose } = require("mongoose");
-const cloudinary = require("../utils/cloudinary");
 const uploadImage = require("../utils/uploadImage");
+const OTP = require("../models/otp.model");
+const { sendOTP } = require("../utils/sendOTP");
 
 const getAllUsers = asyncWrapper(async (req, res) => {
     const search = req.query.search || "";
@@ -61,6 +62,14 @@ const register = asyncWrapper(async (req, res) => {
         throw CustomError.create(400, "email is exist");
     }
 
+    const otp = await sendOTP(email);
+
+    await OTP.create({
+        email,
+        otp,
+        expiresAt: Date.now() + 5 * 60 * 1000, // بعد 5 دقايق
+    });
+
     let avatarUrl;
     if (req.file) {
         avatarUrl = await uploadImage(req.file, "users", email);
@@ -85,6 +94,32 @@ const register = asyncWrapper(async (req, res) => {
         status: httpStatusText.SUCCESS,
         data: { user }
     });
+});
+
+const verifyOTP = asyncWrapper(async (req, res) => {
+    const { email, otp } = req.body;
+
+    const otpRecord = await OTP.findOne({
+        email,
+        expiresAt: { $gt: Date.now() }
+    }).sort({ createdAt: -1 });
+
+    if (!otpRecord) {
+        throw CustomError.create(400, "OTP expired or not found");
+    }
+
+    if (otpRecord.otp !== otp) {
+        throw CustomError.create(400, "Invalid OTP");
+    }
+    await OTP.deleteOne({ _id: otpRecord._id });
+
+    const user = await Users.findOne({ email });
+    if (user && !user.isVerified) {
+        user.isVerified = true;
+        await user.save();
+    }
+
+    res.status(200).json({ message: "OTP verified successfully" });
 });
 
 const login = asyncWrapper(async (req, res) => {
@@ -219,5 +254,6 @@ module.exports = {
     login,
     setAdmin,
     deleteUser,
-    updateUser
+    updateUser,
+    verifyOTP
 }

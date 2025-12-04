@@ -1,6 +1,6 @@
 const express = require('express');
 const verifyToken = require('../middlewares/virfay.token');
-const { getAllUsers, register, login, setAdmin, deleteUser, updateUser } = require('../controllers/users.controller');
+const { getAllUsers, register, login, setAdmin, deleteUser, updateUser, verifyOTP } = require('../controllers/users.controller');
 const verifySuperAdmin = require('../middlewares/verify.super.admin');
 const multer = require("multer");
 const validateImage = require('../middlewares/validate.Image');
@@ -12,6 +12,9 @@ const router = express.Router();
 
 router.route("/")
     .get(verifyToken, verifySuperAdmin, getAllUsers);
+
+router.route("/otp")
+    .post(upload.none(), verifyOTP);
 
 router.route("/register")
     .post(upload.single("avatar"), validateImage, register);
