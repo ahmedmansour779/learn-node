@@ -1,0 +1,2 @@
+add admin type and user type 
+add remove user just by super admin

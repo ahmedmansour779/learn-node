@@ -1,0 +1,3 @@
+https://learn.mongodb.com/ => learn mongodb (no sql)
+https://www.youtube.com/playlist?list=PLDoPjvoNmBAz6DT8SzQ1CODJTH-NIA7R9 => learn sql data base
+
